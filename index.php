@@ -138,7 +138,7 @@ require_once __DIR__ . '/includes/header.php';
             $cats = [
                 ['🛠️','Skills to Learn'],['🎨','Creative Arts'],['🔬','STEM Exploration'],
                 ['📚','Academic Support'],['🗣️','Language Learning'],['🎵','Music and Performance'],
-                ['💻','Technology and Coding'],['🏆','Competition Preparation']
+                ['💻','Technology and Coding'],['🏆','Competition Preparation'],['✨','Others']
             ];
             foreach ($cats as [$icon, $label]):
             ?>

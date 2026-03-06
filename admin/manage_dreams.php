@@ -74,7 +74,7 @@ $dreams->execute($params);
 $dreams = $dreams->fetchAll();
 
 $categories = ['Skills to Learn','Creative Arts','STEM Exploration','Academic Support',
-               'Language Learning','Music and Performance','Technology and Coding','Competition Preparation'];
+               'Language Learning','Music and Performance','Technology and Coding','Competition Preparation','Others'];
 
 require_once __DIR__ . '/../includes/header.php';
 ?>

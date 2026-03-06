@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($description) || strlen($description) < 30) $errors[] = 'Description must be at least 30 characters.';
 
     $validCategories = ['Skills to Learn','Creative Arts','STEM Exploration','Academic Support',
-                        'Language Learning','Music and Performance','Technology and Coding','Competition Preparation'];
+                        'Language Learning','Music and Performance','Technology and Coding','Competition Preparation','Others'];
     if (!in_array($category, $validCategories)) $errors[] = 'Please select a valid category.';
 
     $validBudgets = ['Under ₹500','₹500-₹2,000','₹2,000-₹10,000','₹10,000+'];
@@ -148,7 +148,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 <option value="">— Select category —</option>
                                 <?php
                                 $cats = ['Skills to Learn','Creative Arts','STEM Exploration','Academic Support',
-                                         'Language Learning','Music and Performance','Technology and Coding','Competition Preparation'];
+                                         'Language Learning','Music and Performance','Technology and Coding','Competition Preparation','Others'];
                                 foreach ($cats as $cat):
                                     $sel = ($old['category'] ?? '') === $cat ? 'selected' : '';
                                 ?>

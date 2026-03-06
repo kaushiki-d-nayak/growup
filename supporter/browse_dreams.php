@@ -21,7 +21,7 @@ $perPage  = 9;
 $offset   = ($page - 1) * $perPage;
 
 $categories = ['Skills to Learn','Creative Arts','STEM Exploration','Academic Support',
-               'Language Learning','Music and Performance','Technology and Coding','Competition Preparation'];
+               'Language Learning','Music and Performance','Technology and Coding','Competition Preparation','Others'];
 $budgets    = ['Under ₹500','₹500-₹2,000','₹2,000-₹10,000','₹10,000+'];
 $statuses   = ['Verified','Matched','In Progress','Dream Achieved'];
 
@@ -68,7 +68,7 @@ require_once __DIR__ . '/../includes/header.php';
 $categoryIcons = [
     'Skills to Learn' => '🛠️', 'Creative Arts' => '🎨', 'STEM Exploration' => '🔬',
     'Academic Support' => '📚', 'Language Learning' => '🗣️', 'Music and Performance' => '🎵',
-    'Technology and Coding' => '💻', 'Competition Preparation' => '🏆'
+    'Technology and Coding' => '💻', 'Competition Preparation' => '🏆', 'Others' => '✨'
 ];
 ?>
 

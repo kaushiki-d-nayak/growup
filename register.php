@@ -156,7 +156,7 @@ require_once __DIR__ . '/includes/header.php';
                         <option value="">— Choose a category —</option>
                         <?php
                         $cats = ['Skills to Learn','Creative Arts','STEM Exploration','Academic Support',
-                                 'Language Learning','Music and Performance','Technology and Coding','Competition Preparation'];
+                                 'Language Learning','Music and Performance','Technology and Coding','Competition Preparation','Others'];
                         foreach ($cats as $cat):
                             $sel = ($old['interest_area'] ?? '') === $cat ? 'selected' : '';
                         ?>
