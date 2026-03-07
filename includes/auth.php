@@ -8,6 +8,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+require_once __DIR__ . '/../config/app.php';
 
 /**
  * Check if the user is logged in.
@@ -28,7 +29,8 @@ function userRole(): string {
  */
 function requireLogin(): void {
     if (!isLoggedIn()) {
-        header('Location: /before-i-grow-up/login.php?msg=login_required');
+        $base = defined('BASE_PATH') ? BASE_PATH : '';
+        header('Location: ' . $base . '/login.php?msg=login_required');
         exit;
     }
 }
@@ -39,7 +41,8 @@ function requireLogin(): void {
 function requireRole(string $role): void {
     requireLogin();
     if (userRole() !== $role) {
-        header('Location: /before-i-grow-up/index.php?msg=access_denied');
+        $base = defined('BASE_PATH') ? BASE_PATH : '';
+        header('Location: ' . $base . '/index.php?msg=access_denied');
         exit;
     }
 }

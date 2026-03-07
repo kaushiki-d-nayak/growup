@@ -50,12 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dream_id'])) {
     ");
     $ins->execute([$dreamId, $userId, $supportType]);
 
-    // Update dream status to Matched if still Verified
-    if ($dream['status'] === 'Verified') {
-        $db->prepare("UPDATE dreams SET status='Matched' WHERE id=?")->execute([$dreamId]);
-    }
+    // NOTE: Dream status is NOT changed here.
+    // It stays 'Verified' until the admin explicitly approves this adoption request.
 
-    setFlash('success', 'You\'ve adopted this dream! 💛 Our team will be in touch with next steps.');
+    setFlash('success', 'Your request has been submitted! 💛 The admin will review and approve your adoption request shortly.');
     redirect($base . '/supporter/adopt_dream.php');
 }
 
@@ -75,7 +73,8 @@ if (isset($_GET['dream_id'])) {
 
 // ── Fetch this supporter's adopted dreams ──────────────────
 $myAdoptions = $db->prepare("
-    SELECT ds.*, d.title, d.category, d.status AS dream_status, d.description, s.city, s.age_group
+    SELECT ds.*, d.title, d.category, d.status AS dream_status, d.description, s.city, s.age_group,
+           ds.rejection_reason
     FROM dream_support ds
     JOIN dreams d ON ds.dream_id = d.id
     JOIN students s ON d.student_id = s.id
@@ -161,9 +160,32 @@ require_once __DIR__ . '/../includes/header.php';
                         <span>🎂 Age <?= e($a['age_group']) ?></span>
                         <span>📅 Adopted <?= date('M j, Y', strtotime($a['created_at'])) ?></span>
                     </div>
-                    <div style="margin-top:.75rem;font-size:.8rem;color:var(--muted);">
-                        Support status: <strong style="color:var(--ink);"><?= e($a['status']) ?></strong>
+                    <?php if($a['status'] === 'Rejected'): ?>
+                    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:.85rem 1rem;margin-top:.75rem;">
+                      <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.3rem;">
+                        <span>❌</span>
+                        <strong style="color:#991B1B;font-size:.85rem;">Adoption Request Rejected</strong>
+                      </div>
+                      <p style="color:#B91C1C;font-size:.8rem;margin:0 0 .4rem;line-height:1.5;">
+                        The admin has reviewed your request and it was not approved at this time.
+                      </p>
+                      <?php if($a['rejection_reason']): ?>
+                      <div style="background:rgba(255,255,255,.7);border-radius:7px;padding:.55rem .75rem;border:1px solid #FECACA;">
+                        <strong style="font-size:.75rem;color:#7F1D1D;display:block;margin-bottom:.15rem;">📋 Reason from admin:</strong>
+                        <p style="color:#991B1B;font-size:.8rem;margin:0;line-height:1.5;"><?= e($a['rejection_reason']) ?></p>
+                      </div>
+                      <?php endif; ?>
                     </div>
+                    <?php elseif($a['status'] === 'Approved'): ?>
+                    <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:10px;padding:.7rem 1rem;margin-top:.75rem;font-size:.8rem;color:#065F46;font-weight:600;">
+                      ✅ Adoption approved — you're matched with this dream!
+                    </div>
+                    <?php else: ?>
+                    <div style="margin-top:.75rem;font-size:.8rem;color:var(--muted);">
+                      Support status: <strong style="color:var(--ink);"><?= e($a['status']) ?></strong>
+                      <span style="color:#6B7280;"> · Awaiting admin review</span>
+                    </div>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
             </div>

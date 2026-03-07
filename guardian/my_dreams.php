@@ -17,7 +17,8 @@ $db  = getDB();
 // Fetch all dreams submitted by this guardian
 $stmt = $db->prepare("
     SELECT d.*, s.age_group, s.city,
-           (SELECT COUNT(*) FROM dream_support ds WHERE ds.dream_id = d.id) AS support_count
+           (SELECT COUNT(*) FROM dream_support ds WHERE ds.dream_id = d.id) AS support_count,
+           d.rejection_reason
     FROM dreams d
     JOIN students s ON d.student_id = s.id
     WHERE s.guardian_id = ?
@@ -69,14 +70,38 @@ require_once __DIR__ . '/../includes/header.php';
                                 <span style="font-size:.85rem;color:var(--muted);">💛 <?= $dream['support_count'] ?> supporter(s)</span>
                             </div>
                         </div>
-                        <span class="status-badge status-<?= str_replace(' ', '-', e($dream['status'])) ?>">
-                            <?= e($dream['status']) ?>
-                        </span>
+                        <?php if($dream['status'] === 'Rejected'): ?>
+                          <span class="status-badge" style="background:#FEE2E2;color:#991B1B;">❌ Rejected</span>
+                        <?php else: ?>
+                          <span class="status-badge status-<?= str_replace(' ', '-', e($dream['status'])) ?>"><?= e($dream['status']) ?></span>
+                        <?php endif; ?>
                     </div>
 
                     <p style="font-size:.9rem;margin-bottom:1.5rem;"><?= e(mb_substr($dream['description'], 0, 200)) ?>...</p>
 
+                    <?php if($dream['status'] === 'Rejected'): ?>
+                    <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;padding:1.1rem 1.25rem;margin-bottom:1.5rem;">
+                      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem;">
+                        <span style="font-size:1.25rem;">❌</span>
+                        <strong style="color:#991B1B;font-size:.95rem;">Your Dream Was Rejected</strong>
+                      </div>
+                      <p style="color:#B91C1C;font-size:.875rem;margin:0 0 .5rem;line-height:1.6;">
+                        The admin has reviewed your dream submission and it was not approved at this time.
+                      </p>
+                      <?php if($dream['rejection_reason']): ?>
+                      <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:.65rem .85rem;border:1px solid #FECACA;">
+                        <strong style="font-size:.78rem;color:#7F1D1D;display:block;margin-bottom:.2rem;">📋 Reason from admin:</strong>
+                        <p style="color:#991B1B;font-size:.85rem;margin:0;line-height:1.5;"><?= e($dream['rejection_reason']) ?></p>
+                      </div>
+                      <?php endif; ?>
+                      <p style="color:#B91C1C;font-size:.8rem;margin:.65rem 0 0;">
+                        💡 You can <a href="<?= $base ?>/guardian/submit_dream.php" style="color:#991B1B;font-weight:600;">submit a revised dream</a> addressing the feedback above.
+                      </p>
+                    </div>
+                    <?php endif; ?>
+
                     <!-- Progress Steps -->
+                    <?php if($dream['status'] !== 'Rejected'): ?>
                     <div class="progress-steps">
                         <?php foreach ($statusSteps as $i => $step):
                             $cls = '';
@@ -89,6 +114,7 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                         <?php endforeach; ?>
                     </div>
+                    <?php endif; ?>
 
                     <div style="margin-top:1rem;font-size:.8rem;color:var(--muted);">
                         Submitted on <?= date('F j, Y', strtotime($dream['created_at'])) ?>
