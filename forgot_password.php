@@ -56,7 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                       . '<p>This link will expire in 1 hour. If you did not request a password reset, you can safely ignore this email.</p>'
                       . '<p>With care,<br>' . APP_NAME . ' team</p>';
 
-            sendEmail($email, $subject, $body);
+            if (!sendEmail($email, $subject, $body)) {
+                error_log('Password reset email failed for address: ' . $email);
+            }
         }
 
         // Always show generic message for security
@@ -108,4 +110,3 @@ require_once __DIR__ . '/includes/header.php';
 </div>
 
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
-

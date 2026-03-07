@@ -4,10 +4,19 @@
 
 require_once __DIR__ . '/../config/app.php';
 
-// Load Composer autoloader for PHPMailer (run in project root: composer require phpmailer/phpmailer)
+// Load PHPMailer from Composer when available, otherwise fall back to local PHPMailer/ folder.
 $vendorAutoload = __DIR__ . '/../vendor/autoload.php';
 if (file_exists($vendorAutoload)) {
     require_once $vendorAutoload;
+} else {
+    $phpMailerSrc = __DIR__ . '/../PHPMailer/src/';
+    $phpMailerFiles = ['Exception.php', 'PHPMailer.php', 'SMTP.php'];
+    foreach ($phpMailerFiles as $file) {
+        $full = $phpMailerSrc . $file;
+        if (file_exists($full)) {
+            require_once $full;
+        }
+    }
 }
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -56,8 +65,7 @@ function appUrl(string $path): string {
  */
 function sendEmail(string $to, string $subject, string $htmlBody): bool {
     if (!class_exists(PHPMailer::class)) {
-        // PHPMailer not installed / autoloaded
-        error_log('PHPMailer not available. Install with composer require phpmailer/phpmailer');
+        error_log('PHPMailer not available. Missing vendor autoload and/or PHPMailer/src files.');
         return false;
     }
 
