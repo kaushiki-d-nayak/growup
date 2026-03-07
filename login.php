@@ -101,6 +101,10 @@ require_once __DIR__ . '/includes/header.php';
                 >
             </div>
 
+            <div style="text-align:right;margin-top:.15rem;margin-bottom:.4rem;">
+                <a href="<?= $base ?>/forgot_password.php" style="font-size:.85rem;">Forgot your password?</a>
+            </div>
+
             <button type="submit" class="btn btn-primary w-100" style="margin-top:.5rem;">
                 Sign In →
             </button>
@@ -111,13 +115,6 @@ require_once __DIR__ . '/includes/header.php';
         <p class="text-center" style="font-size:.9rem;">
             Don't have an account? <a href="<?= $base ?>/register.php" style="font-weight:600;">Register here</a>
         </p>
-
-        <div style="margin-top:1.5rem;padding:1rem;background:var(--cream);border-radius:var(--radius);font-size:.8rem;color:var(--muted);">
-            <strong style="color:var(--ink);">Demo Accounts (password for all: Admin@1234)</strong><br>
-            Admin: admin@beforeigrowup.com<br>
-            Guardian: guardian@demo.com<br>
-            Supporter: supporter@demo.com
-        </div>
     </div>
 </div>
 

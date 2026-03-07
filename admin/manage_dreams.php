@@ -3,6 +3,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/app.php';
+require_once __DIR__ . '/../includes/mail.php';
 requireRole('admin');
 $pageTitle = 'Manage Dreams';
 $base = BASE_PATH;
@@ -25,9 +26,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
     $newStatus = $_POST['new_status'] ?? '';
     $valid     = ['Submitted','Verified','Matched','In Progress','Dream Achieved'];
     if (in_array($newStatus, $valid)) {
+        // Fetch guardian + current status for notifications
+        $infoStmt = $db->prepare("
+            SELECT d.title, d.status AS old_status, u.email, u.name
+            FROM dreams d
+            JOIN students s ON d.student_id = s.id
+            JOIN users u ON s.guardian_id = u.id
+            WHERE d.id = ?
+        ");
+        $infoStmt->execute([$dreamId]);
+        $dreamInfo = $infoStmt->fetch();
+
         $db->prepare("UPDATE dreams SET status=?, rejection_reason=NULL WHERE id=?")->execute([$newStatus, $dreamId]);
         $db->prepare("INSERT INTO admin_logs (admin_id,action) VALUES (?,?)")->execute([$_SESSION['user_id'], "Dream #$dreamId → $newStatus"]);
         setFlash('success', 'Dream status updated to "' . $newStatus . '".');
+
+        if ($dreamInfo && !empty($dreamInfo['email'])) {
+            $guardianEmail = $dreamInfo['email'];
+            $guardianName  = $dreamInfo['name'];
+            $title         = $dreamInfo['title'];
+            $oldStatus     = $dreamInfo['old_status'];
+
+            // Notify guardian when dream is approved (Verified)
+            if ($newStatus === 'Verified' && $oldStatus !== 'Verified') {
+                $subject = 'Your dream has been approved ✅';
+                $body    = '<p>Hi ' . e($guardianName) . ',</p>'
+                         . '<p>Your dream "<strong>' . e($title) . '</strong>" has been <strong>approved</strong> by our team and is now visible for supporters to discover and adopt.</p>'
+                         . '<p>You can review the status of all your dreams anytime from your guardian dashboard.</p>'
+                         . '<p>With care,<br>' . APP_NAME . ' team</p>';
+                sendEmail($guardianEmail, $subject, $body);
+            }
+
+            // Notify guardian / student when dream is completed
+            if ($newStatus === 'Dream Achieved') {
+                $subject = 'Dream completed — please confirm 🎉';
+                $body    = '<p>Hi ' . e($guardianName) . ',</p>'
+                         . '<p>Wonderful news! The dream "<strong>' . e($title) . '</strong>" has been marked as <strong>Dream Achieved</strong> in our system.</p>'
+                         . '<p>Please talk with the student and confirm that the dream has truly been completed. If anything doesn\'t look right, reply to this email or contact the platform admin.</p>'
+                         . '<p>Thank you for supporting the student\'s journey.<br>' . APP_NAME . ' team</p>';
+                sendEmail($guardianEmail, $subject, $body);
+            }
+        }
     }
     redirect($base . '/admin/manage_dreams.php' . (isset($_GET['filter']) ? '?filter='.urlencode($_GET['filter']) : ''));
 }
