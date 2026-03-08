@@ -5,6 +5,7 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/../includes/mail.php';
 require_once __DIR__ . '/../includes/dream_achievement.php';
+require_once __DIR__ . '/../includes/dream_feedback.php';
 
 requireRole('admin');
 $pageTitle = 'Matched Pairs';
@@ -12,6 +13,7 @@ $base = BASE_PATH;
 $db   = getDB();
 $adminSidebarActive = 'matched_pairs';
 ensureDreamAchievementSchema($db);
+ensureDreamFeedbackSchema($db);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'request_achievement_confirmation') {
     $dreamId = (int)$_POST['dream_id'];
@@ -59,18 +61,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dream_id'], $_POST['n
     $newStatus = $_POST['new_status'];
 
     if (in_array($newStatus, ['Matched','In Progress','Dream Achieved'], true)) {
+        $oldStatusStmt = $db->prepare("SELECT status FROM dreams WHERE id = ? LIMIT 1");
+        $oldStatusStmt->execute([$dreamId]);
+        $oldStatus = (string)$oldStatusStmt->fetchColumn();
         $confirmation = getDreamAchievementConfirmation($db, $dreamId);
         if ($newStatus === 'Dream Achieved' && (!$confirmation || empty($confirmation['confirmed_at']))) {
             setFlash('error', 'Student confirmation is required before setting Dream Achieved.');
         } else {
             $db->prepare("UPDATE dreams SET status=? WHERE id=?")->execute([$newStatus, $dreamId]);
             $db->prepare("INSERT INTO admin_logs (admin_id, action) VALUES (?,?)")->execute([$_SESSION['user_id'], "Updated dream #$dreamId to '$newStatus'"]);
-            setFlash('success', 'Progress updated to "' . $newStatus . '".');
+            if ($newStatus === 'Dream Achieved' && $oldStatus !== 'Dream Achieved') {
+                $feedbackDelivery = sendDreamFeedbackInvites($db, $dreamId);
+                if ($feedbackDelivery['sent'] > 0) {
+                    setFlash('success', 'Progress updated to "Dream Achieved". Feedback form email sent to ' . $feedbackDelivery['sent'] . ' participant(s).');
+                } else {
+                    setFlash('success', 'Progress updated to "' . $newStatus . '".');
+                }
+            } else {
+                setFlash('success', 'Progress updated to "' . $newStatus . '".');
+            }
         }
     }
     redirect($base . '/admin/matched_pairs.php');
 }
-
 $filterCategory = $_GET['category'] ?? '';
 $filterStatus   = $_GET['status']   ?? '';
 $search         = trim($_GET['search'] ?? '');
@@ -319,6 +332,8 @@ function toggleSb(){document.getElementById('adSb').classList.toggle('open');doc
 function closeSb(){document.getElementById('adSb').classList.remove('open');document.getElementById('sbOv').classList.remove('show');}
 </script>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+
 
 
 

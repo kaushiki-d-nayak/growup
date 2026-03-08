@@ -5,10 +5,15 @@ if (!isset($base)) {
     $base = BASE_PATH;
 }
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/dream_feedback.php';
+require_once __DIR__ . '/auth.php';
 
 $db = getDB();
+ensureDreamFeedbackSchema($db);
 $pendingDreamsSidebar = (int)$db->query("SELECT COUNT(*) FROM dreams WHERE status='Submitted'")->fetchColumn();
 $pendingAdoptionsSidebar = (int)$db->query("SELECT COUNT(*) FROM dream_support WHERE status='Pending'")->fetchColumn();
+$adminId = (int)($_SESSION['user_id'] ?? 0);
+$submittedFeedbackSidebar = getAdminUnreadFeedbackCount($db, $adminId);
 $active = $adminSidebarActive ?? '';
 ?>
 <style>
@@ -45,6 +50,10 @@ $active = $adminSidebarActive ?? '';
     </a>
     <a href="<?= $base ?>/admin/manage_users.php" class="sb-link <?= $active==='users'?'act':'' ?>">
       <span class="sb-ico">&#x1F465;</span> Users
+    </a>
+    <a href="<?= $base ?>/admin/feedback_reviews.php" class="sb-link <?= $active==='feedback'?'act':'' ?>">
+      <span class="sb-ico">&#x1F4DD;</span> Feedback
+      <?php if($submittedFeedbackSidebar>0):?><span class="sb-num"><?= $submittedFeedbackSidebar ?></span><?php endif; ?>
     </a>
     <a href="<?= $base ?>/supporter/browse_dreams.php" class="sb-link">
       <span class="sb-ico">&#x1F310;</span> Public View

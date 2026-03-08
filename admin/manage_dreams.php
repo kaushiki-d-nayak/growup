@@ -5,12 +5,14 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/../includes/mail.php';
 require_once __DIR__ . '/../includes/dream_achievement.php';
+require_once __DIR__ . '/../includes/dream_feedback.php';
 requireRole('admin');
 $pageTitle = 'Manage Dreams';
 $base = BASE_PATH;
 $db   = getDB();
 $adminSidebarActive = 'dreams';
 ensureDreamAchievementSchema($db);
+ensureDreamFeedbackSchema($db);
 
 // ── Handle REJECT ────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'reject_dream') {
@@ -29,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
         try {
             $db->beginTransaction();
             $db->prepare("DELETE FROM dream_achievement_confirmations WHERE dream_id=?")->execute([$dreamId]);
+            $db->prepare("DELETE FROM dream_feedback_requests WHERE dream_id=?")->execute([$dreamId]);
             $db->prepare("DELETE FROM dream_support WHERE dream_id=?")->execute([$dreamId]);
             $db->prepare("DELETE FROM dreams WHERE id=?")->execute([$dreamId]);
             $db->prepare("INSERT INTO admin_logs (admin_id,action) VALUES (?,?)")->execute([$_SESSION['user_id'], "Deleted dream #$dreamId"]);
@@ -103,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
         ");
         $infoStmt->execute([$dreamId]);
         $dreamInfo = $infoStmt->fetch();
+        $oldStatus = $dreamInfo['old_status'] ?? '';
         $confirmation = getDreamAchievementConfirmation($db, $dreamId);
 
         if ($newStatus === 'Dream Achieved' && (!$confirmation || empty($confirmation['confirmed_at']))) {
@@ -116,7 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
                 $guardianEmail = $dreamInfo['email'];
                 $guardianName  = $dreamInfo['name'];
                 $title         = $dreamInfo['title'];
-                $oldStatus     = $dreamInfo['old_status'];
 
                 if ($newStatus === 'Verified' && $oldStatus !== 'Verified') {
                     $subject = 'Your dream has been approved';
@@ -125,6 +128,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
                              . '<p>You can review the status of all your dreams anytime from your guardian dashboard.</p>'
                              . '<p>With care,<br>' . APP_NAME . ' team</p>';
                     sendEmail($guardianEmail, $subject, $body);
+                }
+            }
+
+            if ($newStatus === 'Dream Achieved' && $oldStatus !== 'Dream Achieved') {
+                $feedbackDelivery = sendDreamFeedbackInvites($db, $dreamId);
+                if ($feedbackDelivery['sent'] > 0) {
+                    setFlash('success', 'Dream status updated to "Dream Achieved". Feedback form email sent to ' . $feedbackDelivery['sent'] . ' participant(s).');
                 }
             }
         }

@@ -47,7 +47,11 @@ require_once __DIR__ . '/includes/header.php';
             <a href="<?= $base ?>/supporter/browse_dreams.php" class="btn btn-amber btn-lg">💛 Help a Dream</a>
             <?php endif; ?>
         </div>
-
+        <div class="hero-trust" data-reveal>
+            <span class="hero-trust-item">Admin-verified dreams</span>
+            <span class="hero-trust-item">Guardian-first safety</span>
+            <span class="hero-trust-item">Mentor and sponsor support</span>
+        </div>
         <div class="hero-stats">
             <div class="stat-item" data-reveal>
                 <div class="stat-number"><?= number_format($totalDreams) ?></div>
