@@ -8,6 +8,7 @@ requireRole('admin');
 $pageTitle = 'Manage Users';
 $base = BASE_PATH;
 $db   = getDB();
+$adminSidebarActive = 'users';
 
 $filterRole = $_GET['role']   ?? '';
 $search     = trim($_GET['search'] ?? '');
@@ -36,13 +37,13 @@ require_once __DIR__ . '/../includes/header.php';
 ?>
 <style>
 .ap{display:flex;min-height:calc(100vh - 72px)}
-.ap-nav{width:230px;flex-shrink:0;background:#1A2E25;padding:1.5rem 0 2rem;position:sticky;top:72px;height:calc(100vh - 72px);overflow-y:auto;display:flex;flex-direction:column;transition:left .25s}
-.ap-logo{font-family:'Fraunces',serif;font-size:.9rem;color:rgba(255,255,255,.4);padding:0 1.5rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:.5rem}
-.apl{display:flex;align-items:center;gap:.65rem;padding:.62rem 1.5rem;color:rgba(255,255,255,.6);text-decoration:none;font-size:.86rem;font-weight:500;transition:all .18s;border-left:3px solid transparent}
-.apl:hover{color:#fff;background:rgba(255,255,255,.07);border-left-color:rgba(255,255,255,.15)}
-.apl.on{color:#fff;background:rgba(232,168,56,.13);border-left-color:#E8A838}
-.apl .i{width:18px;text-align:center}
-.apl .n{margin-left:auto;background:#E07058;color:#fff;border-radius:20px;font-size:.64rem;font-weight:700;padding:.08rem .38rem}
+.adm-sb{width:230px;flex-shrink:0;background:#1A2E25;padding:1.5rem 0 2rem;position:sticky;top:72px;height:calc(100vh - 72px);overflow-y:auto;display:flex;flex-direction:column;transition:left .25s}
+.adm-sb-title{font-family:'Fraunces',serif;font-size:.9rem;color:rgba(255,255,255,.4);padding:0 1.5rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:.5rem}
+.sb-link{display:flex;align-items:center;gap:.65rem;padding:.62rem 1.5rem;color:rgba(255,255,255,.6);text-decoration:none;font-size:.86rem;font-weight:500;transition:all .18s;border-left:3px solid transparent}
+.sb-link:hover{color:#fff;background:rgba(255,255,255,.07);border-left-color:rgba(255,255,255,.15)}
+.sb-link.act{color:#fff;background:rgba(232,168,56,.13);border-left-color:#E8A838}
+.sb-ico{width:18px;text-align:center}
+.sb-num{margin-left:auto;background:#E07058;color:#fff;border-radius:20px;font-size:.64rem;font-weight:700;padding:.08rem .38rem}
 .ap-sep{border:none;border-top:1px solid rgba(255,255,255,.07);margin:.4rem 1.25rem}
 .ap-main{flex:1;padding:2rem 2.5rem;background:#F5F0E8;min-width:0}
 .ap-hdr{margin-bottom:1.5rem}
@@ -70,32 +71,19 @@ require_once __DIR__ . '/../includes/header.php';
 .empty{text-align:center;padding:3rem 1rem;color:#7A7060}
 .empty .ei{font-size:2.5rem;margin-bottom:.6rem}
 .ap-tog{display:none;position:fixed;bottom:1.5rem;right:1.5rem;width:48px;height:48px;background:#5C8C6A;color:#fff;border-radius:50%;border:none;font-size:1.1rem;cursor:pointer;z-index:200;box-shadow:0 4px 14px rgba(0,0,0,.2);align-items:center;justify-content:center}
-.ap-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99}
 @media(max-width:900px){
-  .ap-nav{position:fixed;left:-250px;top:0;height:100vh;z-index:100;width:250px}
-  .ap-nav.open{left:0}
+  .adm-sb{position:fixed;left:-250px;top:0;height:100vh;z-index:100;width:250px}
+  .adm-sb.open{left:0}
   .ap-tog{display:flex}
-  .ap-ov.show{display:block}
+  .sb-overlay.show{display:block}
   .ap-main{padding:1.25rem}
 }
 @media(max-width:580px){.ap-main{padding:.9rem}}
 </style>
 
 <div class="ap">
-  <nav class="ap-nav" id="apNav">
-    <div class="ap-logo">Before I Grow Up</div>
-    <a href="<?= $base ?>/admin/dashboard.php" class="apl"><span class="i">📊</span> Dashboard</a>
-    <a href="<?= $base ?>/admin/manage_dreams.php" class="apl">
-      <span class="i">🌟</span> Manage Dreams
-      <?php if($pendingDreams>0):?><span class="n"><?=$pendingDreams?></span><?php endif?>
-    </a>
-    <a href="<?= $base ?>/admin/manage_users.php" class="apl on"><span class="i">👥</span> Manage Users</a>
-    <hr class="ap-sep">
-    <a href="<?= $base ?>/supporter/browse_dreams.php" class="apl"><span class="i">🌐</span> View Site</a>
-    <a href="<?= $base ?>/logout.php" class="apl" style="margin-top:auto"><span class="i">🚪</span> Logout</a>
-  </nav>
-  <div class="ap-ov" id="apOv" onclick="closeNav()"></div>
-
+  <?php require __DIR__ . '/../includes/admin_sidebar.php'; ?>
   <main class="ap-main">
     <div class="ap-hdr">
       <h1>👥 Manage Users</h1>
@@ -183,9 +171,11 @@ require_once __DIR__ . '/../includes/header.php';
   </main>
 </div>
 
-<button class="ap-tog" onclick="openNav()">☰</button>
+<button class="ap-tog" onclick="toggleSb()">&#9776;</button>
 <script>
-function openNav(){document.getElementById('apNav').classList.add('open');document.getElementById('apOv').classList.add('show')}
-function closeNav(){document.getElementById('apNav').classList.remove('open');document.getElementById('apOv').classList.remove('show')}
+function toggleSb(){document.getElementById('adSb').classList.toggle('open');document.getElementById('sbOv').classList.toggle('show')}
+function closeSb(){document.getElementById('adSb').classList.remove('open');document.getElementById('sbOv').classList.remove('show')}
 </script>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+

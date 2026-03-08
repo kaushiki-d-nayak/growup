@@ -9,6 +9,7 @@ requireRole('admin');
 $pageTitle = 'Manage Dreams';
 $base = BASE_PATH;
 $db   = getDB();
+$adminSidebarActive = 'dreams';
 ensureDreamAchievementSchema($db);
 
 // ── Handle REJECT ────────────────────────────────────────────
@@ -270,21 +271,7 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <div class="adm-layout">
-  <aside class="adm-sb" id="adSb">
-    <div class="adm-sb-title">Before I Grow Up</div>
-    <nav>
-      <a href="<?= $base ?>/admin/dashboard.php" class="sb-link"><span class="sb-ico">📊</span> Dashboard</a>
-      <a href="<?= $base ?>/admin/manage_dreams.php" class="sb-link act"><span class="sb-ico">🌟</span> Manage Dreams
-        <?php if($pendingCount>0):?><span class="sb-num"><?=$pendingCount?></span><?php endif;?></a>
-      <a href="<?= $base ?>/admin/manage_adoptions.php" class="sb-link"><span class="sb-ico">🤝</span> Adoptions</a>
-      <a href="<?= $base ?>/admin/matched_pairs.php" class="sb-link"><span class="sb-ico">✅</span> Matched Pairs</a>
-      <a href="<?= $base ?>/admin/manage_users.php" class="sb-link"><span class="sb-ico">👥</span> Users</a>
-      <a href="<?= $base ?>/supporter/browse_dreams.php" class="sb-link"><span class="sb-ico">🌐</span> Public View</a>
-      <a href="<?= $base ?>/logout.php" class="sb-link" style="margin-top:2rem;border-top:1px solid rgba(255,255,255,.1);padding-top:1rem;"><span class="sb-ico">🚪</span> Logout</a>
-    </nav>
-  </aside>
-  <div class="sb-overlay" id="sbOv" onclick="closeSb()"></div>
-
+  <?php require __DIR__ . '/../includes/admin_sidebar.php'; ?>
   <main class="adm-main">
     <div class="adm-hdr">
       <h1>🌟 Manage Dreams</h1>
@@ -413,7 +400,7 @@ require_once __DIR__ . '/../includes/header.php';
   </main>
 </div>
 
-<button class="sb-toggle" onclick="toggleSb()">☰</button>
+<button class="sb-toggle" onclick="toggleSb()">&#9776;</button>
 <script>
 function openModal(id, title) {
   document.getElementById('modalDreamId').value = id;
@@ -429,3 +416,4 @@ function toggleSb(){document.getElementById('adSb').classList.toggle('open');doc
 function closeSb(){document.getElementById('adSb').classList.remove('open');document.getElementById('sbOv').classList.remove('show');}
 </script>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+

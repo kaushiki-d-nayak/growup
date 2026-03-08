@@ -183,6 +183,7 @@ require_once __DIR__ . '/includes/header.php';
                         <?php
                         $cats = ['Skills to Learn','Creative Arts','STEM Exploration','Academic Support',
                                  'Language Learning','Music and Performance','Technology and Coding','Competition Preparation','Others'];
+                        $cats[] = 'Provide Money / Sponsorship';
                         foreach ($cats as $cat):
                             $sel = ($old['interest_area'] ?? '') === $cat ? 'selected' : '';
                         ?>

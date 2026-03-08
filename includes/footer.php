@@ -71,5 +71,55 @@ $role = function_exists('userRole') ? userRole() : '';
     </div>
 </footer>
 
+<script>
+(function () {
+    var path = (window.location.pathname || '').toLowerCase();
+    if (path.indexOf('/admin/') !== -1) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    document.body.classList.add('js-reveal');
+
+    var autoRevealSelectors = [
+        '.hero-eyebrow',
+        '.hero h1',
+        '.hero-sub',
+        '.hero-actions',
+        '.stat-item',
+        '.section-header',
+        '.step-card',
+        '.card',
+        '.category-pill',
+        '.form-card',
+        '.detail-section',
+        '.empty-state',
+        '.flash',
+        '.cta-banner h2',
+        '.cta-banner p',
+        '.cta-actions'
+    ];
+
+    var autoNodes = document.querySelectorAll(autoRevealSelectors.join(','));
+    autoNodes.forEach(function (el) {
+        if (!el.hasAttribute('data-reveal')) {
+            el.setAttribute('data-reveal', '');
+        }
+    });
+
+    var items = document.querySelectorAll('[data-reveal]');
+    if (!items.length) return;
+
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
+    items.forEach(function (el) { observer.observe(el); });
+})();
+</script>
+
 </body>
 </html>

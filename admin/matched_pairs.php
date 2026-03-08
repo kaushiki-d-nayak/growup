@@ -1,5 +1,5 @@
-﻿<?php
-// admin/matched_pairs.php — All confirmed dream-supporter matches with progress tracking
+<?php
+// admin/matched_pairs.php � All confirmed dream-supporter matches with progress tracking
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../config/app.php';
@@ -10,6 +10,7 @@ requireRole('admin');
 $pageTitle = 'Matched Pairs';
 $base = BASE_PATH;
 $db   = getDB();
+$adminSidebarActive = 'matched_pairs';
 ensureDreamAchievementSchema($db);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'request_achievement_confirmation') {
@@ -185,31 +186,17 @@ require_once __DIR__ . '/../includes/header.php';
 </style>
 
 <div class="adm-wrap">
-  <aside class="adm-sb" id="adSb">
-    <div class="adm-sb-title">Before I Grow Up</div>
-    <nav>
-      <a href="<?= $base ?>/admin/dashboard.php" class="sb-link"><span class="sb-ico">ðŸ“Š</span> Dashboard</a>
-      <a href="<?= $base ?>/admin/manage_dreams.php" class="sb-link"><span class="sb-ico">ðŸŒŸ</span> Manage Dreams</a>
-      <a href="<?= $base ?>/admin/manage_adoptions.php" class="sb-link"><span class="sb-ico">ðŸ¤</span> Adoptions
-        <?php if($pendingAdoptions>0):?><span class="sb-num"><?=$pendingAdoptions?></span><?php endif;?></a>
-      <a href="<?= $base ?>/admin/matched_pairs.php" class="sb-link act"><span class="sb-ico">âœ…</span> Matched Pairs</a>
-      <a href="<?= $base ?>/admin/manage_users.php" class="sb-link"><span class="sb-ico">ðŸ‘¥</span> Users</a>
-      <a href="<?= $base ?>/supporter/browse_dreams.php" class="sb-link"><span class="sb-ico">ðŸŒ</span> Public View</a>
-      <a href="<?= $base ?>/logout.php" class="sb-link" style="margin-top:2rem;border-top:1px solid rgba(255,255,255,.1);padding-top:1rem;"><span class="sb-ico">ðŸšª</span> Logout</a>
-    </nav>
-  </aside>
-  <div class="sb-overlay" id="sbOv" onclick="closeSb()"></div>
-
+  <?php require __DIR__ . '/../includes/admin_sidebar.php'; ?>
   <main class="adm-main">
     <div class="adm-hdr">
-      <h1>âœ… Matched Pairs</h1>
+      <h1>✅ Matched Pairs</h1>
       <p>All dreams successfully matched with a mentor or sponsor. Track and update their progress here.</p>
     </div>
 
     <div class="stat-row">
       <div class="stat-pill"><div class="stat-pill-n" style="color:#7C3AED"><?=$totalMatched?></div><div class="stat-pill-l">Total Matched</div></div>
       <div class="stat-pill"><div class="stat-pill-n" style="color:#EA580C"><?=$inProgressCount?></div><div class="stat-pill-l">In Progress</div></div>
-      <div class="stat-pill"><div class="stat-pill-n" style="color:#059669"><?=$achievedCount?></div><div class="stat-pill-l">Achieved ðŸ†</div></div>
+      <div class="stat-pill"><div class="stat-pill-n" style="color:#059669"><?=$achievedCount?></div><div class="stat-pill-l">Achieved 🏆</div></div>
     </div>
 
     <form method="GET" class="filter-bar">
@@ -234,7 +221,7 @@ require_once __DIR__ . '/../includes/header.php';
 
     <?php if(empty($pairs)): ?>
       <div class="empty-box">
-        <div style="font-size:2.5rem;margin-bottom:.5rem">ðŸŒ±</div>
+        <div style="font-size:2.5rem;margin-bottom:.5rem">🌱</div>
         <p style="font-weight:600;color:#374151;margin:.2rem 0">No matched pairs yet</p>
         <p style="font-size:.85rem;margin:0">Approve adoption requests to create matches.</p>
       </div>
@@ -253,16 +240,16 @@ require_once __DIR__ . '/../includes/header.php';
         <div class="pc-top">
           <div class="pc-dream">
             <?php if($p['dream_status']==='Dream Achieved'): ?>
-              <div style="font-size:.75rem;color:#059669;font-weight:700;margin-bottom:.3rem;letter-spacing:.04em">ðŸ† DREAM ACHIEVED!</div>
+              <div style="font-size:.75rem;color:#059669;font-weight:700;margin-bottom:.3rem;letter-spacing:.04em">🏆 DREAM ACHIEVED!</div>
             <?php endif; ?>
             <h3><?= $icon ?> <?= e($p['title']) ?></h3>
-            <p><?= e(mb_substr($p['description'],0,130)) ?><?= mb_strlen($p['description'])>130?'â€¦':'' ?></p>
+            <p><?= e(mb_substr($p['description'],0,130)) ?><?= mb_strlen($p['description'])>130?'…':'' ?></p>
             <div class="chips">
-              <span class="chip">ðŸ“‚ <?= e($p['category']) ?></span>
-              <span class="chip">ðŸ“ <?= e($p['city']) ?></span>
-              <span class="chip">ðŸŽ‚ <?= e($p['age_group']) ?></span>
-              <span class="chip">ðŸ’° <?= e($p['budget_range']) ?></span>
-              <span class="chip">ðŸ‘¨â€ðŸ‘©â€ðŸ‘§ <?= e($p['guardian_name']) ?></span>
+              <span class="chip">📂 <?= e($p['category']) ?></span>
+              <span class="chip">📍 <?= e($p['city']) ?></span>
+              <span class="chip">🎂 <?= e($p['age_group']) ?></span>
+              <span class="chip">💰 <?= e($p['budget_range']) ?></span>
+              <span class="chip">👨‍👩‍👧 <?= e($p['guardian_name']) ?></span>
               <?php if($isConfirmed): ?>
               <span class="chip" style="background:#ECFDF5;border-color:#BBF7D0;color:#166534;">Completion confirmed</span>
               <?php elseif($isRequested): ?>
@@ -276,10 +263,10 @@ require_once __DIR__ . '/../includes/header.php';
               <div class="sa-av"><?= strtoupper(substr($p['supporter_name'],0,1)) ?></div>
               <div class="sa-inf"><?= e($p['supporter_name']) ?>
                 <small><?= e($p['supporter_email']) ?></small>
-                <?php if($p['profession']): ?><small>ðŸ’¼ <?= e($p['profession']) ?></small><?php endif; ?>
+                <?php if($p['profession']): ?><small>💼 <?= e($p['profession']) ?></small><?php endif; ?>
               </div>
             </div>
-            <span class="stype">ðŸ¤² <?= e($p['support_type']) ?></span>
+            <span class="stype">🤲 <?= e($p['support_type']) ?></span>
             <div style="font-size:.7rem;color:#6B7280;margin-top:.4rem">Matched <?= date('M j, Y', strtotime($p['matched_at'])) ?></div>
           </div>
         </div>
@@ -290,10 +277,10 @@ require_once __DIR__ . '/../includes/header.php';
           <div class="progress-line">
             <?php foreach($stepList as $i => $step):
               $done = $i < $currIdx; $curr = $i===$currIdx; ?>
-              <?php if($i>0): ?><span class="ps-arr">â†’</span><?php endif; ?>
+              <?php if($i>0): ?><span class="ps-arr">→</span><?php endif; ?>
               <span class="ps <?= $done?'done':($curr?'curr':'todo') ?>"
                     style="<?= ($done||$curr)?'background:'.$stepColors[$step].';':'' ?>">
-                <?= $done?'âœ“ ':'' ?><?= $step ?>
+                <?= $done?'✓ ':'' ?><?= $step ?>
               </span>
             <?php endforeach; ?>
           </div>
@@ -317,7 +304,7 @@ require_once __DIR__ . '/../includes/header.php';
             <button type="submit" class="bxs bxs-grey"><?= $isRequested ? 'Resend confirmation email' : 'Send completion email' ?></button>
           </form>
           <?php else: ?>
-            <span style="font-size:.8rem;color:#059669;font-weight:600">ðŸŽ‰ Completed!</span>
+            <span style="font-size:.8rem;color:#059669;font-weight:600">🎉 Completed!</span>
           <?php endif; ?>
         </div>
       </div>
@@ -326,10 +313,12 @@ require_once __DIR__ . '/../includes/header.php';
   </main>
 </div>
 
-<button class="sb-toggle" onclick="toggleSb()">â˜°</button>
+<button class="sb-toggle" onclick="toggleSb()">&#9776;</button>
 <script>
 function toggleSb(){document.getElementById('adSb').classList.toggle('open');document.getElementById('sbOv').classList.toggle('show');}
 function closeSb(){document.getElementById('adSb').classList.remove('open');document.getElementById('sbOv').classList.remove('show');}
 </script>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+
 

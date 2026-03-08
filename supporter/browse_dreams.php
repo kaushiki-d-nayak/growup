@@ -22,7 +22,7 @@ $offset   = ($page - 1) * $perPage;
 
 $categories = ['Skills to Learn','Creative Arts','STEM Exploration','Academic Support',
                'Language Learning','Music and Performance','Technology and Coding','Competition Preparation','Others'];
-$budgets    = ['Under ₹500','₹500-₹2,000','₹2,000-₹10,000','₹10,000+'];
+$budgets    = ['No Money Needed','Under Rs500','Rs500-Rs2,000','Rs2,000-Rs10,000','Rs10,000+'];
 $statuses   = ['Verified'];
 
 // Build WHERE clause: only dreams that are still open (not adopted yet)
@@ -200,3 +200,4 @@ $categoryIcons = [
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+

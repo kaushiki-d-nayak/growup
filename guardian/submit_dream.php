@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'Language Learning','Music and Performance','Technology and Coding','Competition Preparation','Others'];
     if (!in_array($category, $validCategories)) $errors[] = 'Please select a valid category.';
 
-    $validBudgets = ['Under ₹500','₹500-₹2,000','₹2,000-₹10,000','₹10,000+'];
+    $validBudgets = ['No Money Needed','Under Rs500','Rs500-Rs2,000','Rs2,000-Rs10,000','Rs10,000+'];
     if (!in_array($budget, $validBudgets)) $errors[] = 'Please select a budget range.';
 
     if (empty($errors)) {
@@ -190,7 +190,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <label for="budget_range">Estimated Support Needed</label>
                             <select name="budget_range" id="budget_range" class="form-control" required>
                                 <option value="">— Select range —</option>
-                                <?php foreach (['Under ₹500','₹500-₹2,000','₹2,000-₹10,000','₹10,000+'] as $b): ?>
+                                <?php foreach (['No Money Needed','Under Rs500','Rs500-Rs2,000','Rs2,000-Rs10,000','Rs10,000+'] as $b): ?>
                                     <option value="<?= $b ?>" <?= ($old['budget_range'] ?? '') === $b ? 'selected' : '' ?>><?= $b ?></option>
                                 <?php endforeach; ?>
                             </select>
@@ -217,4 +217,6 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+
 

@@ -8,6 +8,7 @@ requireRole('admin');
 $pageTitle = 'Admin Dashboard';
 $base = BASE_PATH;
 $db   = getDB();
+$adminSidebarActive = 'dashboard';
 
 $totalDreams      = $db->query("SELECT COUNT(*) FROM dreams")->fetchColumn();
 $pendingDreams    = $db->query("SELECT COUNT(*) FROM dreams WHERE status='Submitted'")->fetchColumn();
@@ -45,13 +46,13 @@ require_once __DIR__ . '/../includes/header.php';
 ?>
 <style>
 .ap{display:flex;min-height:calc(100vh - 72px)}
-.ap-nav{width:230px;flex-shrink:0;background:#1A2E25;padding:1.5rem 0 2rem;position:sticky;top:72px;height:calc(100vh - 72px);overflow-y:auto;display:flex;flex-direction:column;transition:left .25s}
-.ap-logo{font-family:'Fraunces',serif;font-size:.9rem;color:rgba(255,255,255,.4);padding:0 1.5rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:.5rem}
-.apl{display:flex;align-items:center;gap:.65rem;padding:.62rem 1.5rem;color:rgba(255,255,255,.6);text-decoration:none;font-size:.86rem;font-weight:500;transition:all .18s;border-left:3px solid transparent}
-.apl:hover{color:#fff;background:rgba(255,255,255,.07);border-left-color:rgba(255,255,255,.15)}
-.apl.on{color:#fff;background:rgba(232,168,56,.13);border-left-color:#E8A838}
-.apl .i{width:18px;text-align:center}
-.apl .n{margin-left:auto;background:#E07058;color:#fff;border-radius:20px;font-size:.64rem;font-weight:700;padding:.08rem .38rem}
+.adm-sb{width:230px;flex-shrink:0;background:#1A2E25;padding:1.5rem 0 2rem;position:sticky;top:72px;height:calc(100vh - 72px);overflow-y:auto;display:flex;flex-direction:column;transition:left .25s}
+.adm-sb-title{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.4);padding:.5rem 1.5rem 1rem;font-weight:600}
+.sb-link{display:flex;align-items:center;gap:.65rem;padding:.62rem 1.5rem;color:rgba(255,255,255,.6);text-decoration:none;font-size:.86rem;font-weight:500;transition:all .18s;border-left:3px solid transparent}
+.sb-link:hover{color:#fff;background:rgba(255,255,255,.07);border-left-color:rgba(255,255,255,.15)}
+.sb-link.act{color:#fff;background:rgba(232,168,56,.13);border-left-color:#E8A838}
+.sb-ico{width:18px;text-align:center}
+.sb-num{margin-left:auto;background:#E07058;color:#fff;border-radius:20px;font-size:.64rem;font-weight:700;padding:.08rem .38rem}
 .ap-sep{border:none;border-top:1px solid rgba(255,255,255,.07);margin:.4rem 1.25rem}
 .ap-main{flex:1;padding:2rem 2.5rem;background:#F5F0E8;min-width:0}
 .ap-hdr h1{font-family:'Fraunces',serif;font-size:1.75rem;color:#1A2E25;margin:0 0 .2rem;font-weight:700}
@@ -77,7 +78,9 @@ require_once __DIR__ . '/../includes/header.php';
 .bap-r{background:#DC2626;color:#fff}.bap-r:hover{background:#B91C1C}
 .bap-o{background:#fff;color:#374151;border:1px solid #D1D5DB}.bap-o:hover{background:#F3F4F6}
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:.9rem;margin-bottom:1.75rem}
-.stat-box{background:#fff;border-radius:12px;padding:1rem;border:1px solid #E8E0D4;text-align:center}
+.stat-box{display:block;background:#fff;border-radius:12px;padding:1rem;border:1px solid #E8E0D4;text-align:center;text-decoration:none;transition:all .16s}
+.stat-box:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.08);border-color:#D8CCBC}
+.stat-box:focus-visible{outline:2px solid #5C8C6A;outline-offset:2px}
 .stat-n{font-family:'Fraunces',serif;font-size:1.9rem;font-weight:700;line-height:1;margin-bottom:.2rem}
 .stat-l{font-size:.67rem;color:#7A7060;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;margin-bottom:1.4rem}
@@ -97,12 +100,12 @@ require_once __DIR__ . '/../includes/header.php';
 .b-sub{background:#FEF3C7;color:#92400E}.b-ver{background:#DBEAFE;color:#1D4ED8}
 .b-mat{background:#EDE9FE;color:#6D28D9}.b-inp{background:#FFEDD5;color:#C2410C}.b-ach{background:#D1FAE5;color:#065F46}
 .ap-tog{display:none;position:fixed;bottom:1.5rem;right:1.5rem;width:48px;height:48px;background:#5C8C6A;color:#fff;border-radius:50%;border:none;font-size:1.1rem;cursor:pointer;z-index:200;box-shadow:0 4px 14px rgba(0,0,0,.2);align-items:center;justify-content:center}
-.ap-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99}
 @media(max-width:900px){
-  .ap-nav{position:fixed;left:-250px;top:0;height:100vh;z-index:100;width:250px}
-  .ap-nav.open{left:0}
+  .adm-sb{position:fixed;left:-250px;top:0;height:100vh;z-index:100;width:250px}
+  .adm-sb.open{left:0}
   .ap-tog{display:flex}
-  .ap-ov.show{display:block}
+  .sb-overlay.show{display:block}
   .ap-main{padding:1.25rem}
   .two-col{grid-template-columns:1fr}
 }
@@ -114,25 +117,7 @@ require_once __DIR__ . '/../includes/header.php';
 </style>
 
 <div class="ap">
-  <nav class="ap-nav" id="apNav">
-    <div class="ap-logo">Before I Grow Up</div>
-    <a href="<?= $base ?>/admin/dashboard.php" class="apl on">
-      <span class="i">📊</span> Dashboard
-      <?php if($pendingRequests>0):?><span class="n"><?= $pendingRequests ?></span><?php endif?>
-    </a>
-    <a href="<?= $base ?>/admin/manage_dreams.php" class="apl">
-      <span class="i">🌟</span> Manage Dreams
-      <?php if($pendingDreams>0):?><span class="n"><?= $pendingDreams ?></span><?php endif?>
-    </a>
-    <a href="<?= $base ?>/admin/manage_users.php" class="apl">
-      <span class="i">👥</span> Manage Users
-    </a>
-    <hr class="ap-sep">
-    <a href="<?= $base ?>/supporter/browse_dreams.php" class="apl"><span class="i">🌐</span> View Site</a>
-    <a href="<?= $base ?>/logout.php" class="apl" style="margin-top:auto"><span class="i">🚪</span> Logout</a>
-  </nav>
-  <div class="ap-ov" id="apOv" onclick="closeNav()"></div>
-
+  <?php require __DIR__ . '/../includes/admin_sidebar.php'; ?>
   <main class="ap-main">
     <div class="ap-hdr">
       <h1>👋 Welcome, <?= e($_SESSION['name']) ?></h1>
@@ -194,14 +179,14 @@ require_once __DIR__ . '/../includes/header.php';
     <?php endif ?>
 
     <div class="stat-grid">
-      <div class="stat-box"><div class="stat-n" style="color:#5C8C6A"><?= $totalDreams ?></div><div class="stat-l">Total Dreams</div></div>
-      <div class="stat-box"><div class="stat-n" style="color:#D97706"><?= $pendingDreams ?></div><div class="stat-l">Pending Verify</div></div>
-      <div class="stat-box"><div class="stat-n" style="color:#1D4ED8"><?= $verifiedDreams ?></div><div class="stat-l">Verified</div></div>
-      <div class="stat-box"><div class="stat-n" style="color:#6D28D9"><?= $matchedDreams ?></div><div class="stat-l">Matched</div></div>
-      <div class="stat-box"><div class="stat-n" style="color:#C2410C"><?= $inProgressDreams ?></div><div class="stat-l">In Progress</div></div>
-      <div class="stat-box"><div class="stat-n" style="color:#065F46"><?= $achievedDreams ?></div><div class="stat-l">Achieved ✨</div></div>
-      <div class="stat-box"><div class="stat-n" style="color:#5C8C6A"><?= $totalGuardians ?></div><div class="stat-l">Guardians</div></div>
-      <div class="stat-box"><div class="stat-n" style="color:#E8A838"><?= $totalSupporters ?></div><div class="stat-l">Supporters</div></div>
+      <a href="<?= $base ?>/admin/manage_dreams.php" class="stat-box"><div class="stat-n" style="color:#5C8C6A"><?= $totalDreams ?></div><div class="stat-l">Total Dreams</div></a>
+      <a href="<?= $base ?>/admin/manage_dreams.php?filter=Submitted" class="stat-box"><div class="stat-n" style="color:#D97706"><?= $pendingDreams ?></div><div class="stat-l">Pending Verify</div></a>
+      <a href="<?= $base ?>/admin/manage_dreams.php?filter=Verified" class="stat-box"><div class="stat-n" style="color:#1D4ED8"><?= $verifiedDreams ?></div><div class="stat-l">Verified</div></a>
+      <a href="<?= $base ?>/admin/manage_dreams.php?filter=Matched" class="stat-box"><div class="stat-n" style="color:#6D28D9"><?= $matchedDreams ?></div><div class="stat-l">Matched</div></a>
+      <a href="<?= $base ?>/admin/manage_dreams.php?filter=In+Progress" class="stat-box"><div class="stat-n" style="color:#C2410C"><?= $inProgressDreams ?></div><div class="stat-l">In Progress</div></a>
+      <a href="<?= $base ?>/admin/manage_dreams.php?filter=Dream+Achieved" class="stat-box"><div class="stat-n" style="color:#065F46"><?= $achievedDreams ?></div><div class="stat-l">Achieved</div></a>
+      <a href="<?= $base ?>/admin/manage_users.php?role=guardian" class="stat-box"><div class="stat-n" style="color:#5C8C6A"><?= $totalGuardians ?></div><div class="stat-l">Guardians</div></a>
+      <a href="<?= $base ?>/admin/manage_users.php?role=supporter" class="stat-box"><div class="stat-n" style="color:#E8A838"><?= $totalSupporters ?></div><div class="stat-l">Supporters</div></a>
     </div>
 
     <div class="two-col">
@@ -259,9 +244,10 @@ require_once __DIR__ . '/../includes/header.php';
   </main>
 </div>
 
-<button class="ap-tog" onclick="openNav()">☰</button>
+<button class="ap-tog" onclick="toggleSb()">&#9776;</button>
 <script>
-function openNav(){document.getElementById('apNav').classList.add('open');document.getElementById('apOv').classList.add('show')}
-function closeNav(){document.getElementById('apNav').classList.remove('open');document.getElementById('apOv').classList.remove('show')}
+function toggleSb(){document.getElementById('adSb').classList.toggle('open');document.getElementById('sbOv').classList.toggle('show')}
+function closeSb(){document.getElementById('adSb').classList.remove('open');document.getElementById('sbOv').classList.remove('show')}
 </script>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
