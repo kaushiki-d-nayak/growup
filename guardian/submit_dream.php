@@ -5,6 +5,7 @@
 // ============================================================
 
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/validation.php';
 require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/dream_achievement.php';
@@ -25,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Student info
     $ageGroup  = $_POST['age_group']   ?? '';
     $city      = trim($_POST['city']   ?? '');
-    $studentEmail = trim($_POST['student_email'] ?? '');
+    $studentEmail = normalizeEmail($_POST['student_email'] ?? '');
 
     // Dream info
     $title       = trim($_POST['title']       ?? '');
@@ -36,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validate
     if (!in_array($ageGroup, ['6-9','10-12','13-15','16-18'])) $errors[] = 'Please select an age group.';
     if (empty($city) || strlen($city) < 2)   $errors[] = 'Please enter the student\'s city.';
-    if ($studentEmail !== '' && !filter_var($studentEmail, FILTER_VALIDATE_EMAIL)) $errors[] = 'Please enter a valid student email address.';
+    if ($studentEmail !== '' && !isValidEmail($studentEmail)) $errors[] = 'Please enter a valid student Gmail address ending with @gmail.com.';
     if (empty($title) || strlen($title) < 5) $errors[] = 'Dream title must be at least 5 characters.';
     if (empty($description) || strlen($description) < 30) $errors[] = 'Description must be at least 30 characters.';
 
@@ -144,8 +145,10 @@ require_once __DIR__ . '/../includes/header.php';
                     <div class="form-group">
                         <label for="student_email">Student Email (optional)</label>
                         <input type="email" id="student_email" name="student_email" class="form-control"
-                            placeholder="student@example.com"
-                            value="<?= e($old['student_email'] ?? '') ?>">
+                            placeholder="student@gmail.com"
+                            value="<?= e($old['student_email'] ?? '') ?>"
+                            pattern="^[A-Za-z0-9._%+-]+@gmail\\.com$"
+                            title="Enter a student Gmail address ending with @gmail.com">
                         <span class="form-hint">Used only for dream completion confirmation requests.</span>
                     </div>
                 </div>

@@ -5,6 +5,7 @@
 // ============================================================
 
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/validation.php';
 require_once __DIR__ . '/config/app.php';
 require_once __DIR__ . '/config/database.php';
 
@@ -18,11 +19,13 @@ if (isLoggedIn()) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email    = trim($_POST['email'] ?? '');
+    $email    = normalizeEmail($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
 
     if (empty($email) || empty($password)) {
         $error = 'Please fill in all fields.';
+    } elseif (!isValidEmail($email)) {
+        $error = 'Use your Gmail address ending with @gmail.com.';
     } else {
         $db   = getDB();
         $stmt = $db->prepare("SELECT * FROM users WHERE email = ? LIMIT 1");
@@ -83,8 +86,10 @@ require_once __DIR__ . '/includes/header.php';
                     id="email"
                     name="email"
                     class="form-control"
-                    placeholder="you@example.com"
+                    placeholder="you@gmail.com"
                     value="<?= e($_POST['email'] ?? '') ?>"
+                    pattern="^[A-Za-z0-9._%+-]+@gmail\\.com$"
+                    title="Enter your Gmail address ending with @gmail.com"
                     required
                 >
             </div>

@@ -3,6 +3,7 @@
 
 require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/mail.php';
+require_once __DIR__ . '/validation.php';
 
 function ensureDreamFeedbackSchema(PDO $db): void {
     static $ensured = false;
@@ -93,8 +94,8 @@ function getDreamFeedbackRequestByToken(PDO $db, string $token): ?array {
 }
 
 function createDreamFeedbackRequest(PDO $db, int $dreamId, string $role, string $name, string $email): ?array {
-    $email = trim($email);
-    if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $email = normalizeEmail($email);
+    if (!isValidEmail($email)) {
         return null;
     }
 

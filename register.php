@@ -5,6 +5,7 @@
 // ============================================================
 
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/validation.php';
 require_once __DIR__ . '/config/app.php';
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/mail.php';
@@ -22,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $old = $_POST;
 
     $name     = trim($_POST['name']     ?? '');
-    $email    = strtolower(trim($_POST['email'] ?? ''));
+    $email    = normalizeEmail($_POST['email'] ?? '');
     $password = $_POST['password']      ?? '';
     $confirm  = $_POST['confirm']       ?? '';
     $role     = $_POST['role']          ?? '';
@@ -36,8 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (strlen($name) < 2) $errors[] = 'Name must be at least 2 characters.';
     if (empty($email)) {
         $errors[] = 'Email address is required.';
-    } elseif (strlen($email) > 254 || preg_match('/\s/', $email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'Enter a valid email address.';
+    } elseif (!isValidEmail($email)) {
+        $errors[] = 'Enter a valid Gmail address ending with @gmail.com.';
     }
     if (empty($password)) $errors[] = 'Password is required.';
     if (strlen($password) < 8) $errors[] = 'Password must be at least 8 characters.';
@@ -145,13 +146,13 @@ require_once __DIR__ . '/includes/header.php';
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" class="form-control"
-                    placeholder="you@example.com"
+                    placeholder="you@gmail.com"
                     value="<?= e($old['email'] ?? '') ?>"
                     maxlength="254"
                     inputmode="email"
                     autocomplete="email"
-                    pattern="^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
-                    title="Enter a valid email address (example: name@example.com)"
+                    pattern="^[A-Za-z0-9._%+-]+@gmail\\.com$"
+                    title="Enter a Gmail address ending with @gmail.com"
                     required>
             </div>
 

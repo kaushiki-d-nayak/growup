@@ -2,6 +2,7 @@
 // forgot_password.php — Request password reset link
 
 require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/validation.php';
 require_once __DIR__ . '/config/app.php';
 require_once __DIR__ . '/config/database.php';
 require_once __DIR__ . '/includes/mail.php';
@@ -16,10 +17,12 @@ if (isLoggedIn()) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
+    $email = normalizeEmail($_POST['email'] ?? '');
 
     if ($email === '') {
         $error = 'Please enter your email address.';
+    } elseif (!isValidEmail($email)) {
+        $error = 'Use a valid Gmail address ending with @gmail.com.';
     } else {
         $db = getDB();
 
@@ -92,8 +95,10 @@ require_once __DIR__ . '/includes/header.php';
                     id="email"
                     name="email"
                     class="form-control"
-                    placeholder="you@example.com"
+                    placeholder="you@gmail.com"
                     value="<?= e($_POST['email'] ?? '') ?>"
+                    pattern="^[A-Za-z0-9._%+-]+@gmail\\.com$"
+                    title="Enter a Gmail address ending with @gmail.com"
                     required
                 >
             </div>
