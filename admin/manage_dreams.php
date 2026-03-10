@@ -138,7 +138,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
             }
         }
     }
-
     redirect($base . '/admin/manage_dreams.php' . (isset($_GET['filter']) ? '?filter='.urlencode($_GET['filter']) : ''));
 }
 // ── Filters ──────────────────────────────────────────────────
