@@ -1,10 +1,11 @@
 <?php
-define('DB_HOST', 'localhost');
+define('DB_HOST', 'growup.c944ysk6m0y8.ap-south-1.rds.amazonaws.com');
 define('DB_NAME', 'growup');
-define('DB_USER', 'root');       
-define('DB_PASS', '');          
+define('DB_USER', 'admin');       
+define('DB_PASS', 'kaushiki123');          
 define('DB_CHARSET', 'utf8mb4');
 
+require_once __DIR__ . '/../includes/dreams_schema.php';
 
 function getDB(): PDO {
     static $pdo = null;
@@ -19,6 +20,7 @@ function getDB(): PDO {
 
         try {
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+            ensureDreamsBudgetSchema($pdo);
         } catch (PDOException $e) {
             // In production, log this error instead of displaying it
             die('<div style="font-family:sans-serif;color:#c0392b;padding:2rem;">

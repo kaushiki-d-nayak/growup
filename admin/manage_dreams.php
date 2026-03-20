@@ -345,7 +345,7 @@ require_once __DIR__ . '/../includes/header.php';
               <?php if(!empty($d['student_email'])): ?><span><?= e($d['student_email']) ?></span><?php endif; ?>
               <span><?= e($d['city']) ?></span>
               <span>Age <?= e($d['age_group']) ?></span>
-              <span><?= e($d['budget_range']) ?></span>
+              <span><?= displayBudget($d['budget_range'] ?? null) ?></span>
               <span><?= date('M j, Y', strtotime($d['created_at'])) ?></span>
             </div>
             <?php if($isRej && $d['rejection_reason']): ?>

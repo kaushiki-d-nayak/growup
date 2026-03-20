@@ -115,7 +115,7 @@ require_once __DIR__ . '/includes/header.php';
                 <div class="dream-meta">
                     <span>📍 <?= e($dream['city']) ?></span>
                     <span>🎂 Age <?= e($dream['age_group']) ?></span>
-                    <span>💰 <?= e($dream['budget_range']) ?></span>
+                    <span>💰 <?= displayBudget($dream['budget_range'] ?? null) ?></span>
                     <span class="status-badge status-<?= str_replace(' ', '-', e($dream['status'])) ?>"><?= e($dream['status']) ?></span>
                 </div>
                 <a href="<?= $base ?>/supporter/browse_dreams.php" class="btn btn-outline btn-sm" style="margin-top:.75rem;">View Dream →</a>

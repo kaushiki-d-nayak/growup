@@ -61,7 +61,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <div style="display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.5rem;">
                                 <span style="font-size:.85rem;color:var(--muted);">📍 <?= e($dream['city']) ?></span>
                                 <span style="font-size:.85rem;color:var(--muted);">🎂 Age <?= e($dream['age_group']) ?></span>
-                                <span style="font-size:.85rem;color:var(--muted);">💰 <?= e($dream['budget_range']) ?></span>
+                                <span style="font-size:.85rem;color:var(--muted);">💰 <?= displayBudget($dream['budget_range'] ?? null) ?></span>
                                 <span style="font-size:.85rem;color:var(--muted);">💛 <?= $dream['support_count'] ?> supporter(s)</span>
                             </div>
                         </div>

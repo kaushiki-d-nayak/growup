@@ -49,6 +49,14 @@ function e(string $str): string {
 }
 
 /**
+ * Format budget range for display with a safe fallback.
+ */
+function displayBudget(?string $budget): string {
+    $budget = trim((string)$budget);
+    return $budget !== '' ? e($budget) : 'Not provided';
+}
+
+/**
  * Redirect helper.
  */
 function redirect(string $url): void {

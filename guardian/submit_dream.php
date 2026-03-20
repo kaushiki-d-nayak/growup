@@ -28,6 +28,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = trim($_POST['description'] ?? '');
     $category    = $_POST['category']         ?? '';
     $budget      = $_POST['budget_range']     ?? '';
+    if ($budget === '' && isset($_POST['budget_range_safe'])) {
+        $budget = $_POST['budget_range_safe'];
+    }
+    $budget = trim($budget);
 
     // Validate
     if (!in_array($ageGroup, ['6-9','10-12','13-15','16-18'])) $errors[] = 'Please select an age group.';
@@ -58,6 +62,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ");
             $stmtD->execute([$studentId, $title, $description, $category, $budget]);
             $dreamId = (int)$db->lastInsertId();
+            // Persist budget explicitly and keep a backup row for recovery.
+            $db->prepare("
+                INSERT INTO dreams_budget_backup (dream_id, budget_range)
+                VALUES (?, ?)
+                ON DUPLICATE KEY UPDATE budget_range = VALUES(budget_range)
+            ")->execute([$dreamId, $budget]);
+            $db->prepare("UPDATE dreams SET budget_range = ? WHERE id = ?")->execute([$budget, $dreamId]);
 
             $db->commit();
 
@@ -128,6 +139,7 @@ require_once __DIR__ . '/../includes/header.php';
                                     </option>
                                 <?php endforeach; ?>
                             </select>
+                            <input type="hidden" name="budget_range_safe" id="budget_range_safe" value="<?= e($old['budget_range'] ?? '') ?>">
                         </div>
                         <div class="form-group">
                             <label for="city">City / Region</label>
@@ -214,6 +226,18 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
 </div>
 
+<script>
+  (function(){
+    const budgetSelect = document.getElementById('budget_range');
+    const budgetSafe = document.getElementById('budget_range_safe');
+    if (!budgetSelect || !budgetSafe) return;
+    const syncBudget = () => { if (budgetSelect.value) budgetSafe.value = budgetSelect.value; };
+    budgetSelect.addEventListener('change', syncBudget);
+    const form = budgetSelect.closest('form');
+    if (form) form.addEventListener('submit', syncBudget);
+    syncBudget();
+  })();
+</script>
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
 
 

@@ -139,7 +139,7 @@ $categoryIcons = [
                     <div class="dream-meta">
                         <span>📍 <?= e($dream['city']) ?></span>
                         <span>🎂 Age <?= e($dream['age_group']) ?></span>
-                        <span>💰 <?= e($dream['budget_range']) ?></span>
+                        <span>💰 <?= displayBudget($dream['budget_range'] ?? null) ?></span>
                         <?php if ($dream['support_count'] > 0): ?>
                             <span>💛 <?= $dream['support_count'] ?> supporter(s)</span>
                         <?php endif; ?>

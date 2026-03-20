@@ -132,7 +132,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="dream-meta" style="margin-top:1rem;padding-top:.75rem;border-top:1px solid var(--border);">
                     <span>📍 <?= e($adoptingDream['city']) ?></span>
                     <span>🎂 Age <?= e($adoptingDream['age_group']) ?></span>
-                    <span>💰 <?= e($adoptingDream['budget_range']) ?></span>
+                    <span>💰 <?= displayBudget($adoptingDream['budget_range'] ?? null) ?></span>
                 </div>
             </div>
 

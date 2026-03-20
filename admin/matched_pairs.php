@@ -260,7 +260,7 @@ require_once __DIR__ . '/../includes/header.php';
               <span class="chip">📂 <?= e($p['category']) ?></span>
               <span class="chip">📍 <?= e($p['city']) ?></span>
               <span class="chip">🎂 <?= e($p['age_group']) ?></span>
-              <span class="chip">💰 <?= e($p['budget_range']) ?></span>
+              <span class="chip">💰 <?= displayBudget($p['budget_range'] ?? null) ?></span>
               <span class="chip">👨‍👩‍👧 <?= e($p['guardian_name']) ?></span>
               <?php if($isConfirmed): ?>
               <span class="chip" style="background:#ECFDF5;border-color:#BBF7D0;color:#166534;">Completion confirmed</span>
