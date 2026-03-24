@@ -32,7 +32,7 @@ require_once __DIR__ . '/includes/header.php';
 <section class="hero">
     <div class="container hero-content">
         <span class="hero-eyebrow" data-reveal>🌟 Safe · Moderated · Inspiring</span>
-        <h1 data-reveal>Where Young <em>Dreams</em><br>Find Helping Hands..</h1>
+        <h1 data-reveal>Where Young <em>Dreams</em><br>Find Helping Hands</h1>
         <p class="hero-sub" data-reveal>A safe, moderated platform connecting students under 18 with mentors and sponsors who care — no direct contact, full guardian oversight.</p>
         <div class="hero-actions" data-reveal>
             <?php if ($role !== 'supporter'): ?>
