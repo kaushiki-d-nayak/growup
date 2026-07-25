@@ -5,7 +5,16 @@
 
 Built with care, structure, and real-world workflows, this project connects hope with action.
 
-🔗 **Live Website:** [https://beforeigrowup.online/](https://beforeigrowup.online/)
+## 🚀 Deployment
+
+Previously deployed on AWS EC2 using:
+- Ubuntu Server
+- AWS EC2
+- RDS MySQL
+- Route 53
+- Jenkins CI/CD
+
+(Current live deployment is unavailable.)
 
 ---
 
